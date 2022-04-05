@@ -1,0 +1,66 @@
+﻿@page "/pokemon"
+@using Pokemon.Models
+
+@inject IHttpClientFactory _clientFactory
+
+<h3>Pokemon Data</h3>
+<br />
+<br />
+<br />
+
+
+@if (string.IsNullOrWhiteSpace(errorString) == false)
+{
+    <div class="h2">@errorString</div>
+}
+else if(pokemon is null)
+{
+    <div class="h3">Loading Pokemon</div>
+    <div><img src = "~/loading-buffering.gif" /></div>
+}
+else
+{
+    <div class="h2">It's a wild @pokemon.Name</div>
+    <div>
+        <img src=@pokemon.sprites.front_default >
+        <p>
+          @pokemon.Name ID is @pokemon.Id
+        </p>
+        <p>
+          @pokemon.Name Height is @pokemon.Height
+        </p>
+        <p>
+          @pokemon.Name Shiny form
+        </p>
+        <img src=@pokemon.sprites.front_shiny>
+    </div>
+
+}
+
+@code {
+
+    PokemonModel pokemon;
+    string errorString;
+    string image;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = _clientFactory.CreateClient();
+
+        try
+        {
+            pokemon = await client.GetFromJsonAsync<PokemonModel>("https://pokeapi.co/api/v2/pokemon/ditto");
+            errorString = null;
+            
+            
+        }
+        catch(Exception ex)
+        {
+            errorString = $"Error getting pokemon data: {ex.Message}";
+        }
+
+    }
+
+
+}
