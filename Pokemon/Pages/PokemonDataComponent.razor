@@ -1,17 +1,21 @@
-﻿@page "/pokemon"
+@page "/pokemon"
 @using Pokemon.Models
-
+@using System;
+@using System.Collections.Generic;
 @inject IHttpClientFactory _clientFactory
 
 <h3>Pokemon Data</h3>
 <br />
+<input type="text" @bind="pokemonName" />
+<button class="btn btn-primary" @onclick="FindPokemon">Find Pokemon</button>
+<button class="btn btn-primary" @onclick="RandomPokemon">Random Pokemon</button>
 <br />
 <br />
 
 
 @if (string.IsNullOrWhiteSpace(errorString) == false)
 {
-    <div class="h2">@errorString</div>
+    <div class="h2">You may have spelled the Pokemon's name wrong</div>
 }
 else if(pokemon is null)
 {
@@ -23,6 +27,7 @@ else
     <div class="h2">It's a wild @pokemon.Name</div>
     <div>
         <img src=@pokemon.sprites.front_default >
+        <img src=@pokemon.sprites.back_default>
         <p>
           @pokemon.Name ID is @pokemon.Id
         </p>
@@ -30,9 +35,18 @@ else
           @pokemon.Name Height is @pokemon.Height
         </p>
         <p>
+            
+            @pokemon.Weight
+            @pokemon.Order
+
+        </p>
+
+        <p>
           @pokemon.Name Shiny form
         </p>
         <img src=@pokemon.sprites.front_shiny>
+        <img src=@pokemon.sprites.back_shiny>
+        
     </div>
 
 }
@@ -42,25 +56,49 @@ else
     PokemonModel pokemon;
     string errorString;
     string image;
+    string pokemonName;
+   
 
+        
 
-    protected override async Task OnInitializedAsync()
+    protected async Task FindPokemon()
     {
         var client = _clientFactory.CreateClient();
-
-        try
-        {
-            pokemon = await client.GetFromJsonAsync<PokemonModel>("https://pokeapi.co/api/v2/pokemon/ditto");
+         try
+            {   
+            pokemon = await client.GetFromJsonAsync<PokemonModel>($"https://pokeapi.co/api/v2/pokemon/{pokemonName}");
             errorString = null;
-            
-            
-        }
-        catch(Exception ex)
-        {
-            errorString = $"Error getting pokemon data: {ex.Message}";
-        }
+                
+                
+            }
+            catch(Exception ex)
+            {
+                errorString = $"Error getting pokemon data: {ex.Message}";
+            }
+        
 
     }
 
+    protected async Task RandomPokemon()
+    {   
+        var client = _clientFactory.CreateClient();
+        Random rnd = new Random();
+        int random = rnd.Next(0, 928);
+       
+        try
+            {   
+            pokemon = await client.GetFromJsonAsync<PokemonModel>($"https://pokeapi.co/api/v2/pokemon/{random}");
+            errorString = null;
+                
+                
+            }
+            catch(Exception ex)
+            {
+                errorString = $"Error getting pokemon data: {ex.Message}";
+            }
+        
 
+    }
+
+    
 }
