@@ -1,5 +1,5 @@
 ## Pokemon
 
-### Uses the PokemonAPI to get the data for a Ditto. 
+### Uses the PokemonAPI to get the data for a Pokemon. 
 
 
